@@ -6,6 +6,8 @@ let mongodb = require('mongodb');
 let app = express();
 //Here I created the variable db which is empty. This variable i use to store the conection for database. It is important taht this variable be on global scope
 let db;
+//This will make content of this public folder avaiable to the root of our app
+app.use(express.static('public'));
 //Here i put the connection data from mongo db admin. Important note is that I must use the node 2.2 conncetion data this is because node 3 data for connection was throwing me  the error
 let connectionString = 'mongodb://todoappuser:9ORZoTeUChWHNtvp@cluster0-shard-00-00-6hgnx.mongodb.net:27017,cluster0-shard-00-01-6hgnx.mongodb.net:27017,cluster0-shard-00-02-6hgnx.mongodb.net:27017/TodoApp?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority';
 //Establishing connectioh with mongoDB. I call the mongodb variable wich held the monogodb package and attach on it the conncet method. Connect method must have 3 arguments. FIrst argument is a conncetion string. Connection string tels the mongo db where and what we will conect to. This is the code form mongoDB admin panel. Because the cod is to long I will store it in the variable and I only here call that varaiable. On third argument we provide the function that the conncet metod will call after it open the connection. This function have 2 parametars and that is the error and client. The second param useNewUrlParse is the mongo db object
@@ -22,6 +24,8 @@ mongodb.connect(connectionString,{useNewUrlParser: true}, function(err, client){
   app.listen(300);
   }
 });
+
+app.use(express.json());
 //This configures express so the express can add input value inside the body of request
 app.use(express.urlencoded({extended: false}));
 //What will app do when recives the get request on the home page. When user request the homepage with get request then this code triger the anonimus function which have 2 parameters and that is request and resposne
@@ -70,7 +74,8 @@ app.get('/', function(req,res){
     </ul>
     
   </div>
-  
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="/browser.js"></script>
 </body>
 </html>
 
@@ -93,4 +98,9 @@ app.post('/create-item', function(req, res){
   });
    
 })
+
+app.post('/update-item', function(req,res){
+   console.log(req.body.text);
+   res.send("Success");
+});
 
