@@ -26,8 +26,15 @@ mongodb.connect(connectionString,{useNewUrlParser: true}, function(err, client){
 app.use(express.urlencoded({extended: false}));
 //What will app do when recives the get request on the home page. When user request the homepage with get request then this code triger the anonimus function which have 2 parameters and that is request and resposne
 app.get('/', function(req,res){
-  //This will display the code block when someone visits our homepage. Here i put the html which will be loaded when someone visit our website. I put this html into the template literals because I want to write inside of it the js code. Here I use the bootstrap for nice UX
-  res.send(` 
+  //Here I call db variable and attached the collection method which have the name of database which I will read the data. After that I added the find method this method is from mongoDb. This will find the data from database
+  //Whit this I read all documents from database
+  //Attachedt also the toArray method this method will convert data from databas in the array so I can easy to handled with thaht data. This method toArray expect as argument the functon which will be trigered after the connection whith db is complete
+  //The function in toArray argument recives two parametars and that are the first one is the error and secoond is the data which is read from db and parsed into the array
+  db.collection('items').find().toArray(function(err, items){
+
+    //This will enabled that the data will load on homescrean after the conncetion is open with data base an after it read that data from database
+    //This will display the code block when someone visits our homepage. Here i put the html which will be loaded when someone visit our website. I put this html into the template literals because I want to write inside of it the js code. Here I use the bootstrap for nice UX
+    res.send(` 
 
   <!DOCTYPE html>
 <html>
@@ -51,27 +58,15 @@ app.get('/', function(req,res){
     </div>
     
     <ul class="list-group pb-5">
-      <li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
-        <span class="item-text">Fake example item #1</span>
+      ${items.map(function(item){
+        return `<li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+        <span class="item-text"> ${item.text} </span>
         <div>
           <button class="edit-me btn btn-secondary btn-sm mr-1">Edit</button>
           <button class="delete-me btn btn-danger btn-sm">Delete</button>
         </div>
-      </li>
-      <li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
-        <span class="item-text">Fake example item #2</span>
-        <div>
-          <button class="edit-me btn btn-secondary btn-sm mr-1">Edit</button>
-          <button class="delete-me btn btn-danger btn-sm">Delete</button>
-        </div>
-      </li>
-      <li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
-        <span class="item-text">Fake example item #3</span>
-        <div>
-          <button class="edit-me btn btn-secondary btn-sm mr-1">Edit</button>
-          <button class="delete-me btn btn-danger btn-sm">Delete</button>
-        </div>
-      </li>
+      </li>`
+      }).join('')}
     </ul>
     
   </div>
@@ -81,6 +76,11 @@ app.get('/', function(req,res){
 
 
   `);
+    
+  });
+
+  
+  
 })
 //When the browser send the post request with /create-item than do this function. This create item is the action of form
 app.post('/create-item', function(req, res){
@@ -89,7 +89,7 @@ app.post('/create-item', function(req, res){
   //InsertOne is the method for mongoDB which creates the new item in that collection. This method recives 2 arguments. First argument is the object and that object will be stored in database. All database itmes in monogo DB are stored as objects. In this insertOne first argument I created object with the key of text and value of the users input. This will crated new document in the database with the key and value as I specify. Secon argument is the anonimus function which will triger after the insertOne creates the item in the collection or database
   db.collection('items').insertOne({text: req.body.item}, function(){
   
-    res.send("Thank you for form");
+    res.redirect('/');
   });
    
 })
