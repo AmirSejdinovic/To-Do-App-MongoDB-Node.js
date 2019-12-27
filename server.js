@@ -2,6 +2,7 @@
 let express = require('express');
 //Here I importing the mongodb from the samename package which I instaled with npm comand npm install mongodb
 let mongodb = require('mongodb');
+let sanitizeHTML = require('sanitize-html');
 //Calling the express
 let app = express();
 //Here I created the variable db which is empty. This variable i use to store the conection for database. It is important taht this variable be on global scope
@@ -28,7 +29,28 @@ mongodb.connect(connectionString,{useNewUrlParser: true}, function(err, client){
 app.use(express.json());
 //This configures express so the express can add input value inside the body of request
 app.use(express.urlencoded({extended: false}));
+//This is the custom function which will password protected the ux area. Here I declare three parametars 
+function passwordProtected(req, res, next){
+   //This will send a user poup window to put the username and password
+  res.set('WWW-Authenticate', 'Basic realm="Simple Todo App"');
+  //After all above parametars are done than do the next function inside the app or node server
+  //This will logout the password that user input in the hashtag so I can use it on the if statement
+  console.log(req.headers.authorization);
+  //With this if statement i comapre if the input in the promt widow is equal setup password and it is "admin" but here is the encirpted
+  if(req.headers.authorization == "Basic bGVhcm46YWRtaW4="){
+     //If the user inputs correct password than do the next function. That means display the UI on thre browser 
+    next();
+
+  }else{
+    //If the inputed password is incorect than return status of 401 and send this message
+     res.status(401).send("Authentication required");
+  }
+
+}
+//This will tell our express to use this function for all url calls.
+app.use(passwordProtected);
 //What will app do when recives the get request on the home page. When user request the homepage with get request then this code triger the anonimus function which have 2 parameters and that is request and resposne
+//I pase a another function as third argument. This function I declare above. This function will password protected our app
 app.get('/', function(req,res){
   //Here I call db variable and attached the collection method which have the name of database which I will read the data. After that I added the find method this method is from mongoDb. This will find the data from database
   //Whit this I read all documents from database
@@ -88,7 +110,9 @@ app.post('/create-item', function(req, res){
   //Here I on the db variable which is the mongoDB variable put the method of collection. The collection is the row in the mongoDB. This collection method will select the collection with provided name from monogDB in my case it is the 'items' collection
   //InsertOne is the method for mongoDB which creates the new item in that collection. This method recives 2 arguments. First argument is the object and that object will be stored in database. All database itmes in monogo DB are stored as objects. In this insertOne first argument I created object with the key of text and value of the users input. This will crated new document in the database with the key and value as I specify. Secon argument is the anonimus function which will triger after the insertOne creates the item in the collection or database
   //Now we replace item with the text. Text is the porpety in axios post request and it have value of input field
-  db.collection('items').insertOne({text: req.body.text}, function(err, info){
+  //Here I created the variable with sanitazeHTM which will sanitaze user input. This method recives two arguments an that are the first user inut and secoodn as js object the alowed . Now all user input will be cleeen pain text
+  let safeText = sanitizeHTML(req.body.text, {allowedTags: [], allowedAttributes: {} });
+  db.collection('items').insertOne({text: safeText}, function(err, info){
   
     res.json(info.ops[0]);
   });
@@ -99,7 +123,8 @@ app.post('/update-item', function(req,res){
   //Updating the database recives three arguments. First is the which item will be update
   //Secon argument is the comand for update the db. Here we put the comand which table we will be updating
   //Third argument is the function which will be activated after the update was done
-   db.collection('items').findOneAndUpdate({_id: new mongodb.ObjectID(req.body.id)},{$set: {text: req.body.text}}, function(){
+  let safeText = sanitizeHTML(req.body.text, {allowedTags: [], allowedAttributes: {} });
+   db.collection('items').findOneAndUpdate({_id: new mongodb.ObjectID(req.body.id)},{$set: {text: safeText}}, function(){
      res.send("Success");
    })
 });
