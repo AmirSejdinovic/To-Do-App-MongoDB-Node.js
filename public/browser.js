@@ -10,6 +10,12 @@ function itemTemplate(item){
 </li>`;
 }
 
+//Initail Page Load Render
+//Here I create the map method on array items which I stored in server.js in thml 
+let ourHTML = items.map(function(item){
+  return itemTemplate(item);
+}).join('');
+ document.getElementById("item-list").insertAdjacentHTML("beforeend", ourHTML);
 //Create feature
 //Creating the variable with value of selector of element
 let createField = document.getElementById("create-field");
