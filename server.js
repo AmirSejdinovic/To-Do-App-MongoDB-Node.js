@@ -53,15 +53,15 @@ app.get('/', function(req,res){
     <h1 class="display-4 text-center py-1">To-Do App</h1>
     
     <div class="jumbotron p-3 shadow-sm">
-      <form action="create-item" method="POST">
+      <form id="create-form" action="create-item" method="POST">
         <div class="d-flex align-items-center">
-          <input name="item" autofocus autocomplete="off" class="form-control mr-3" type="text" style="flex: 1;">
+          <input id="create-field" name="item" autofocus autocomplete="off" class="form-control mr-3" type="text" style="flex: 1;">
           <button class="btn btn-primary">Add New Item</button>
         </div>
       </form>
     </div>
     
-    <ul class="list-group pb-5">
+    <ul id="item-list" class="list-group pb-5">
       ${items.map(function(item){
         return `<li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
         <span class="item-text"> ${item.text} </span>
@@ -92,9 +92,10 @@ app.post('/create-item', function(req, res){
   //With this req.body.item I pickup the input value and I can use it anywhere I want. "item" is the name proprety of input inside html template
   //Here I on the db variable which is the mongoDB variable put the method of collection. The collection is the row in the mongoDB. This collection method will select the collection with provided name from monogDB in my case it is the 'items' collection
   //InsertOne is the method for mongoDB which creates the new item in that collection. This method recives 2 arguments. First argument is the object and that object will be stored in database. All database itmes in monogo DB are stored as objects. In this insertOne first argument I created object with the key of text and value of the users input. This will crated new document in the database with the key and value as I specify. Secon argument is the anonimus function which will triger after the insertOne creates the item in the collection or database
-  db.collection('items').insertOne({text: req.body.item}, function(){
+  //Now we replace item with the text. Text is the porpety in axios post request and it have value of input field
+  db.collection('items').insertOne({text: req.body.text}, function(err, info){
   
-    res.redirect('/');
+    res.json(info.ops[0]);
   });
    
 })

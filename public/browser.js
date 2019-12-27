@@ -1,3 +1,35 @@
+
+//Creating the function which will hendl the li template for ux
+function itemTemplate(item){
+ return `<li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+ <span class="item-text"> ${item.text} </span>
+ <div>
+   <button data-id="${item._id}" class="edit-me btn btn-secondary btn-sm mr-1">Edit</button>
+   <button data-id="${item._id}" class="delete-me btn btn-danger btn-sm">Delete</button>
+ </div>
+</li>`;
+}
+
+//Create feature
+//Creating the variable with value of selector of element
+let createField = document.getElementById("create-field");
+//Selecting form and adding ti a addeventlistener. And preventig it from defaul behaviou an it is a reloadin a page
+document.getElementById("create-form").addEventListener("submit", function(e){
+  e.preventDefault();
+   //Creating axios post req which will be sennding ghe info from input value
+  axios.post('/create-item', {text: createField.value }).then(function(resposne){
+     //Create the html for a new item
+     //Adding a new item in the ul list
+     document.getElementById("item-list").insertAdjacentHTML("beforeend", itemTemplate(resposne.data));
+     //Reseting the input filed
+     createField.value = "";
+     //Geting foocus on input field
+     createField.focus();
+  }).catch();
+
+});
+
+
 //Here I setup the addEventListener to the document
 document.addEventListener("click", function(e){
   //DELETE FEATURE
