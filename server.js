@@ -43,7 +43,7 @@ function passwordProtected(req, res, next){
   //This will logout the password that user input in the hashtag so I can use it on the if statement
   console.log(req.headers.authorization);
   //With this if statement i comapre if the input in the promt widow is equal setup password and it is "admin" but here is the encirpted
-  if(req.headers.authorization == "Basic bGVhcm46YWRtaW4="){
+  if(req.headers.authorization == "Basic YTphZG1pbg=="){
      //If the user inputs correct password than do the next function. That means display the UI on thre browser 
     next();
 
