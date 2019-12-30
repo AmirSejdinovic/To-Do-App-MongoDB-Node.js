@@ -7,6 +7,12 @@ let sanitizeHTML = require('sanitize-html');
 let app = express();
 //Here I created the variable db which is empty. This variable i use to store the conection for database. It is important taht this variable be on global scope
 let db;
+//Creating the variable wiht heroku prot dinamic number
+let port = process.env.PORT;
+//Checking if the port is null or empty string tha update port variable to 300. This is our local port
+if(port  == null || port == ""){
+   port = 300
+}
 //This will make content of this public folder avaiable to the root of our app
 app.use(express.static('public'));
 //Here i put the connection data from mongo db admin. Important note is that I must use the node 2.2 conncetion data this is because node 3 data for connection was throwing me  the error
@@ -22,7 +28,7 @@ mongodb.connect(connectionString,{useNewUrlParser: true}, function(err, client){
   db = client.db()
   //I calling here that node start listen the port 300 only when we have open connection to mongo db
   //Listening the por 300
-  app.listen(300);
+  app.listen(port);
   }
 });
 
