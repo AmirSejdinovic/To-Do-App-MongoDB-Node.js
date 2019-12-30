@@ -54,7 +54,7 @@ function passwordProtected(req, res, next){
 
 }
 //This will tell our express to use this function for all url calls.
-app.use(passwordProtected);
+//app.use(passwordProtected);
 //What will app do when recives the get request on the home page. When user request the homepage with get request then this code triger the anonimus function which have 2 parameters and that is request and resposne
 //I pase a another function as third argument. This function I declare above. This function will password protected our app
 app.get('/', function(req,res){
